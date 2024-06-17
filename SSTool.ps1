@@ -16,7 +16,7 @@ function Menu {
     Write-Host "1. BAM"
     Write-Host "2. Recycle Bin"
     Write-Host "3. Check Services"
-    Write-Host "4. Soon"
+    Write-Host "4. Usb-Events"
     Write-Host "5. Soon"
     Write-Host "6. Salir"
     Write-Host "===================="
@@ -52,6 +52,47 @@ function Get-RecycleBinLastModified {
         Write-Host "No se encontraron archivos en la Papelera de reciclaje."
     }
 }
+# Definir la función para obtener los eventos de dispositivos USB
+
+function Get-USBEvents {
+    # Establecer el rango de fechas para la consulta (últimos 7 días, por ejemplo)
+    $startDate = (Get-Date).AddDays(-7)
+    $endDate = Get-Date
+
+    # Obtener eventos relacionados con USB en el registro de eventos del sistema
+    $usbEvents_System = Get-WinEvent -FilterHashtable @{
+        LogName = 'System'
+        StartTime = $startDate
+        EndTime = $endDate
+    } | Where-Object {
+        $_.Message -match 'USB' -or $_.Message -match 'Device connected' -or $_.Message -match 'Device disconnected'
+    } | Select-Object TimeCreated, Id, Message
+
+    # Obtener eventos relacionados con USB en el registro de eventos del DriverFrameworks
+    $usbEvents_Driver = Get-WinEvent -FilterHashtable @{
+        LogName = 'Microsoft-Windows-DriverFrameworks-UserMode/Operational'
+        StartTime = $startDate
+        EndTime = $endDate
+    } | Where-Object {
+        $_.Message -match 'USB' -or $_.Message -match 'Device connected' -or $_.Message -match 'Device disconnected'
+    } | Select-Object TimeCreated, Id, Message
+
+    # Combinar y ordenar los eventos por fecha y hora
+    $events = $usbEvents_System + $usbEvents_Driver | Sort-Object TimeCreated
+
+    # Mostrar los eventos
+    $events | ForEach-Object {
+        [PSCustomObject]@{
+            Tiempo = $_.TimeCreated
+            Evento = $_.Id
+            Mensaje = $_.Message
+        }
+    } | Format-Table -AutoSize
+}
+
+
+
+
 
 
 function Process-Menu {
@@ -72,6 +113,14 @@ function Process-Menu {
             Menu
 $selection = Read-Host "Seleccione una opción"
 Process-Menu -Eleccion $selection
+        }
+        '4'{
+            Get-USBEvents
+                Start-Sleep 15
+                Clear-Host
+                Menu
+                $selection = Read-Host "Seleccione una opción"
+                Process-Menu -Eleccion $selection
         }
         '3'{
             $ErrorActionPreference = "SilentlyContinue"  
