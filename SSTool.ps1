@@ -59,22 +59,22 @@ function Get-USBEvents {
     $startDate = (Get-Date).AddDays(-7)
     $endDate = Get-Date
 
-    # Obtener eventos relacionados con USB en el registro de eventos del sistema
+    # Filtrar eventos relacionados con USB en el registro de eventos del sistema
     $usbEvents_System = Get-WinEvent -FilterHashtable @{
         LogName = 'System'
         StartTime = $startDate
         EndTime = $endDate
     } | Where-Object {
-        $_.Message -match 'USB' -or $_.Message -match 'Device connected' -or $_.Message -match 'Device disconnected'
+        $_.Message -like '*USB*' -or $_.Message -like '*Device connected*' -or $_.Message -like '*Device disconnected*'
     } | Select-Object TimeCreated, Id, Message
 
-    # Obtener eventos relacionados con USB en el registro de eventos del DriverFrameworks
+    # Filtrar eventos relacionados con USB en el registro de eventos del DriverFrameworks
     $usbEvents_Driver = Get-WinEvent -FilterHashtable @{
         LogName = 'Microsoft-Windows-DriverFrameworks-UserMode/Operational'
         StartTime = $startDate
         EndTime = $endDate
     } | Where-Object {
-        $_.Message -match 'USB' -or $_.Message -match 'Device connected' -or $_.Message -match 'Device disconnected'
+        $_.Message -like '*USB*' -or $_.Message -like '*Device connected*' -or $_.Message -like '*Device disconnected*'
     } | Select-Object TimeCreated, Id, Message
 
     # Combinar y ordenar los eventos por fecha y hora
