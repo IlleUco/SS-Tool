@@ -103,7 +103,6 @@ function Process-Menu {
         '1' {
             Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
             Invoke-Expression (Invoke-RestMethod https://raw.githubusercontent.com/IlleUco/ScreenShare/main/BamRobadoIlleUco.ps1)ç
-            Clear-Host
             Menu
             $selection = Read-Host "Seleccione una opción"
             Process-Menu -Eleccion $selection
