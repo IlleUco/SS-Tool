@@ -102,7 +102,7 @@ function Process-Menu {
     switch($Eleccion) {
         '1' {
             Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-            Invoke-Expression (Invoke-RestMethod https://raw.githubusercontent.com/IlleUco/ScreenShare/main/BamRobadoIlleUco.ps1)ç
+            Invoke-Expression (Invoke-RestMethod https://raw.githubusercontent.com/IlleUco/ScreenShare/main/BamRobadoIlleUco.ps1)
           
         }
         '2'{
